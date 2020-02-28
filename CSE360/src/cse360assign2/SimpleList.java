@@ -2,18 +2,20 @@
 /**
  * @author Piyapot Charles Phataraphruk
  * @ClassID 217
- * @Assignment 1
- * @since 2020-02-10
+ * @Assignment 2
+ * @since 2020-02-27
  * This is a simple list program that can input up to 10 integers into an array,
  * remove an integer from the array, print the array as a string, and locate
  * the index of an integer in the array.
+ * This program is for assignment 2.
+ * URL to repository: https://github.com/pcphatar217/CSE360_Spring2020
 */ 
 package cse360assign2;
 /**
  * The SimpleList class contains two private variables of an integer array list 
  * and integer counter. There is a constructor that initializes the two private 
  * variables. The program contains five methods which are add(), remove(), 
- * count(), toString(), and search().
+ * count(), toString(), search(),append(), first(), last(), and size().
  */
 public class SimpleList 
 { 
@@ -35,17 +37,20 @@ public class SimpleList
 	 * value in the previous index. The new value 
 	 * will then be placed in index zero and 
 	 * the counter will increment. But if the 
-	 * List is full then the shift will begin at 
-	 * the final index where that value will be 
-	 * overridden and thus removed. The counter
-	 * will not increment when adding an integer
-	 * to a full list.
+	 * List is full then a copy array will be 
+	 * made but with 50% more spaces. The original
+	 * values will be shifted by 1 to the right when
+	 * copied so the new parameter can be added at 
+	 * index 0. The main list will then be set equal
+	 * to the copy list which mean the main list is now
+	 * updated.
 	 * @param integer
 	 */
 	public void add(int integer) 
 	{														
+	int arrayLength = list.length; //arrayLength tells the current length of the array list.
 	
-		if (count < 10) 										//Instance where the array is not full
+		if (count < arrayLength) 										//Instance where the array is not full
 		{														
 			for(int shift = count;shift > 0;shift--) 			
 			{													
@@ -54,12 +59,18 @@ public class SimpleList
 			list[0]=integer;									
 			this.count++;										
 		}														
-		else {													//An instance where the array is full
-			for(int shift = 9;shift > 0;shift--) 
+		else 
+		{													//An instance where the array is full.
+			int increaseList50Percent = 0;		  				 //Used to help in increasing the size of the array list
+			increaseList50Percent=arrayLength+arrayLength/2;	//Value of the length when increased by 50%.
+			int[] copyList = new int[increaseList50Percent];	//Creates a new array that will be the increase of the original list. 
+			for(int copy = 0;copy < count;copy++) 				//Loop that copies the contents of the original list to the new.
 			{													
-				list[shift] = list[shift - 1];					
-			}
-			list[0]=integer;									
+				copyList[copy+1] = list[copy];					//Leave the initial index empty for the new element. 
+			}		
+			list = copyList;									//Copies the new list to the original which makes it larger
+			list[0]=integer;									//Inputs the new value
+			this.count++;										//Increase the count.
 		}
 	}
 	
@@ -72,20 +83,58 @@ public class SimpleList
 	 * to the left. Once the elements have shifted,
 	 * the method will override the last element 
 	 * with a zero and the counter will decrement.
+	 * The remove method now check to see if more 
+	 * than 25% of the list are empty spaces and 
+	 * if so it will remove the empty spaces, unless
+	 * if there is only one element in the list, by
+	 * making a copy of the original list but 
+	 * without the empty spaces. The original list 
+	 * will then be set equal to the copy which means
+	 * the list has been updated and the rest of the 
+	 * remove method will execute.
+	 * 
 	 * @param integer
 	 */
 	public void remove(int integer) 
-	{															
-		for(int scan = 0;scan < 10;scan++) 
+	{									
+		int arrayLength = list.length;			//arrayLength tells the current length of the array list.
+		int decreasedList25Percent = 0;			//Used to help in decreasing the size of the array list
+		int emptySpace = 0;						
+		int twentyFivePercentLength = 0;
+		twentyFivePercentLength = arrayLength / 4;
+		emptySpace = arrayLength - count;
+		
+		for(int scan = 0;scan < count;scan++) 
 		{														
 			if (list[scan]==integer) 
-			{													
-				for(int shift = scan;shift < count-1;shift++) 
-				{ 												
-					list[shift] = list[shift+1];				
+			{	
+				if(emptySpace > twentyFivePercentLength && arrayLength > 1)
+				{
+					decreasedList25Percent=arrayLength - twentyFivePercentLength;	//Value of the length when decreased by 25%.
+					int[] copyList = new int[decreasedList25Percent];				//Creates a new array that will be the decrease of the original list. 
+					for(int copy = 0;copy < count;copy++) 							//Loop that copies the contents of the original list to the new.
+					{													
+						copyList[copy] = list[copy];					
+					}		
+					list = copyList;												//Copies the new list to the original which makes it smaller
+					for(int shift = scan;shift < count-1;shift++) 
+					{ 												
+						list[shift] = list[shift+1];				
+					}
+					list[count-1]=0;								
+					this.count--;
+					
 				}
-				list[count-1]=0;								
-				this.count--;									
+				else
+				{
+					for(int shift = scan;shift < count-1;shift++) 
+					{ 												
+						list[shift] = list[shift+1];				
+					}
+					list[count-1]=0;								
+					this.count--;	
+				}
+				break;
 			}
 		}
 	}
@@ -138,6 +187,81 @@ public class SimpleList
 			}
 		}
 		return -1;
+	}
+	
+	/**
+	 * This method works similarly as add() however,
+	 * it places the parameter at the end of the list. 
+	 * The method will check if the list is full and 
+	 * if that is the case, the list size
+	 * will increase by 50%.
+	 * @param integer
+	 */
+	public void append(int integer)
+	{
+		int arrayLength = list.length; 							//arrayLength tells the current length of the array list.
+		
+		if (count < arrayLength) 								//Instance where the array is not full
+		{																											
+			list[count]=integer;									
+			this.count++;										
+		}														
+		else {													//An instance where the array is full.
+			int increaseList50Percent = 0;		   				//Used to help in increasing the size of the array list
+			increaseList50Percent=arrayLength+arrayLength/2;	//Value of the length when increased by 50%.
+			int[] copyList = new int[increaseList50Percent];	//Creates a new array that will be the increase of the original list. 
+			for(int copy = 0;copy < count;copy++) 				//Loop that copies the contents of the original list to the new.
+			{													
+				copyList[copy] = list[copy];					//Leave the initial index empty for the new element. 
+			}		
+			list = copyList;									//Copies the new list to the original which makes it larger
+			list[count]=integer;								//Inputs the new value
+			this.count++;										//Increase the count.
+		}
+	}
+	
+	/**
+	 * This method returns the first value in the list.
+	 * If there isn't then return -1.
+	 * @return
+	 */
+	public int first()
+	{
+		if(count>0)
+		{
+			return list[0];	
+		}
+		else
+		{
+			return -1;
+		}
+		
+	}
+	
+	/**
+	 * This method returns the last value in the list.
+	 * If there isn't then return -1.
+	 * @return
+	 */
+	public int last()
+	{
+		if(count>0)
+		{
+			return list[count-1];	
+		}
+		else
+		{
+			return -1;
+		}
+	}
+	
+	/**
+	 * This method returns the length of the list.
+	 * @return
+	 */
+	public int size() 
+	{															
+		return this.list.length;										
 	}
 	
 }
